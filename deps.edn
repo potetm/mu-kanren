@@ -1,6 +1,7 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.9.0"}
         org.clojure/data.xml {:mvn/version "0.0.8"}
+        org.clojure/math.combinatorics {:mvn/version "0.1.4"}
         org.clojure/tools.nrepl {:mvn/version "0.2.13"}}
  :mvn/repos {"central" {:url "https://repo1.maven.org/maven2/"}
              "clojars" {:url "https://repo.clojars.org/"}}}
