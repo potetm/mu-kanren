@@ -4,7 +4,7 @@
   The one notable exception is the fact that I did not include
   vars in the monadic value. This is ok because it's a toy implementation,
   and the var name gets prefixed in the resultant states."
-  (:refer-clojure :exclude [conj disj ==]))
+  (:refer-clojure :exclude [==]))
 
 (defn lvar
   ([]
@@ -49,16 +49,16 @@
       (unit s')
       mzero)))
 
-(defn conj
+(defn conj*
   ([g] g)
   ([g1 g2]
    (fn [s]
      (bind (g1 s)
            g2)))
   ([a b & more]
-   (conj a (apply conj b more))))
+   (conj* a (apply conj* b more))))
 
-(defn disj [& goals]
+(defn disj* [& goals]
   (fn [s]
     (apply mplus
            (map (fn [g]
@@ -74,8 +74,8 @@
        ((f v) s)))))
 
 (defn conde [& goals]
-  (apply disj (map (partial apply conj)
-                   goals)))
+  (apply disj* (map (partial apply conj*)
+                    goals)))
 
 (defmacro fresh [vars & goals]
   (if (seq vars)
@@ -83,7 +83,7 @@
              (fn [~(first vars)]
                (fresh ~(rest vars)
                       ~@goals)))
-    `(conj ~@goals)))
+    `(conj* ~@goals)))
 
 (def empty-state {})
 (defn call-empty-state [g]
@@ -103,11 +103,11 @@
   ((fresh* (fn [q]
              (== q 5))) empty-state)
   (def a-and-b
-    (conj (fresh* (fn [a]
-                    (== a 7)))
-          (fresh* (fn [b]
-                    (disj (== b 5)
-                          (== b 6))))))
+    (conj* (fresh* (fn [a]
+                     (== a 7)))
+           (fresh* (fn [b]
+                     (disj* (== b 5)
+                            (== b 6))))))
 
   (a-and-b empty-state)
 

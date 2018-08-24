@@ -126,11 +126,11 @@
 
 (defn firsto [h t]
   (fresh [r]
-    (conso h r t)))
+         (conso h r t)))
 
 (defn resto [r t]
   (fresh [h]
-    (conso h r t)))
+         (conso h r t)))
 
 (defmacro defer [g]
   `(mapcat (fn [s#]
@@ -141,8 +141,8 @@
   (conde
     [(firsto v col)]
     [(fresh [t]
-       (resto t col)
-       (defer (membero v t)))]))
+            (resto t col)
+            (defer (membero v t)))]))
 
 (defn reify-lvars [lvars]
   (map (fn [s]
@@ -182,20 +182,21 @@
 (defn relation
   ([data e k v]
    (mapcat (fn [s]
-             (let [p (walk s e)
-                   k (walk s k)
-                   v (walk s v)]
+             (let [e' (walk s e)
+                   k' (walk s k)
+                   v' (walk s v)]
                (keep (fn [x]
                        (unify s
                               (list* x)
-                              (list p k v)))
+                              (list e' k' v')))
                      data)))))
   ([data {:keys [ekv kve vek]} e k v]
    (mapcat (fn [s]
              (condp = [(grounded? e)
                        (grounded? k)
                        (grounded? v)]
-               [false false false] (relation data e k v)
+               [false false false] (eduction (relation data e k v)
+                                             [s])
 
                [true true true] (when (get-in ekv [e k v])
                                   [s])
@@ -335,9 +336,9 @@
   (def $ (to-db-seq xml-data))
   (run [p v]
        (fresh [p' a]
-         (relation $ p :tag :min)
-         (relation $ p :content p')
-         (relation $ p' a v)))
+              (relation $ p :tag :min)
+              (relation $ p :content p')
+              (relation $ p' a v)))
 
   (run [q]
        (conde
